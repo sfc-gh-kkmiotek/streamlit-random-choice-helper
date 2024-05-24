@@ -18,7 +18,11 @@ def update_choice(option, it=None):
 
 def delete_choice(option):
     available_choices = st.query_params.get_all(QUERY_PARAM_NAME)
-    available_choices.remove(option)
+    try:
+        available_choices.remove(option)
+    except ValueError:
+        pass
+
     st.query_params[QUERY_PARAM_NAME] = available_choices
 
 
@@ -41,6 +45,12 @@ def generate_row(it, option):
 
 
 with st.expander(label='Choices'):
+    st.markdown('''
+        Provide multiple choices, you can edit, add and delete them from this section
+        After you are done click the roll button to get a new random choice,
+        You can save your preselected choices by simply copying link or bookmarking it
+    ''')
+
     for it, option in enumerate(st.query_params.get_all(QUERY_PARAM_NAME)):
         generate_row(it, option)
 
@@ -51,9 +61,14 @@ with st.expander(label='Choices'):
     with col2:
         st.button(label='Add ✅', use_container_width=True, on_click=lambda: update_choice(new_text))
 
+st.subheader('Options')
+st.text(', '.join(st.query_params.get_all(QUERY_PARAM_NAME)))
+
 if st.query_params.get_all(QUERY_PARAM_NAME):
     get_next = st.button('Roll 🎰', use_container_width=True)
 
 if get_next:
     st.header('_Next choice:_')
-    st.header(f'{get_random_choice()}', )
+    st.markdown(f"<h1 style='text-align: center;'>{get_random_choice()}</h1>", unsafe_allow_html=True)
+
+    st.balloons()
